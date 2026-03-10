@@ -5,6 +5,10 @@ services:
     image: caddy:2
     container_name: homelab-caddy
     restart: unless stopped
+    depends_on:
+      - vaultwarden
+      - gitea
+      - grafana
     ports: 
       - "8080:80"
     volumes:
@@ -14,10 +18,37 @@ services:
     networks:
       - homelab
 
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: homelab-vaultwarden
+    restart: unless-stopped
     volumes:
-      caddy_data:
-      caddy_config:
+      - ../data/vaultwarden:/data
+    networks:
+      - homelab
+
+  gitea:
+    image: gitea/gitea:latest
+    container_name: homelab-gitea
+    restart: unless-stopped
+    volumes:
+      - ../data/gitea:/data
+    networks:
+      - homelab
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: homelab-grafana
+    restart: unless-stopped
+    volumes:
+      - ../data/grafana:/var/lib/grafana
+    networks:
+      - homelab
 
   networks:
     homelab:
 
+
+  volumes:
+    caddy_data:
+      caddy_config:
