@@ -1,0 +1,11 @@
+vault.localhost {
+    reverse_proxy vaultwarden:80
+}
+
+grafana.localhost {
+    reverse_proxy grafana:3000
+}
+
+gitea.localhost {
+    reverse_proxy gitea:3000
+}
