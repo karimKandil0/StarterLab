@@ -53,22 +53,43 @@ fi
 case "$DISTRO" in
     ubuntu|debian)
         sudo apt update
-	$INSTALL_DOCKER && sudo apt intall -y docker.io docker-compose-plugin
-	$INSTALL_GETTEXT && sudo apt install -y gettext
+
+        if $INSTALL_DOCKER; then
+            sudo apt install -y docker.io docker-compose-plugin
+        fi
+
+        if $INSTALL_GETTEXT; then
+            sudo apt install -y gettext
+        fi
         ;;
+
     arch)
-        $INSTALL_DOCKER && sudo pacman -Sy --noconfirm docker docker-compose-plugin
-	$INSTALL_GETTEXT && sudo pacman -Sy --noconfirm gettext
-	;;
+        if $INSTALL_DOCKER; then
+            sudo pacman -Sy --noconfirm docker docker-compose
+        fi
+
+        if $INSTALL_GETTEXT; then
+            sudo pacman -Sy --noconfirm gettext
+        fi
+        ;;
+
     fedora)
-        $INSTALL_DOCKER && sudo dnf install -y docker docker-compose-plugin
-	$INSTALL_GETTEXT && sudo dnf install -y gettext
-	;;
+        if $INSTALL_DOCKER; then
+            sudo dnf install -y docker docker-compose-plugin
+        fi
+
+        if $INSTALL_GETTEXT; then
+            sudo dnf install -y gettext
+        fi
+        ;;
+
     *)
         echo "Unsupported distro: $DISTRO"
-	exit 1
-	;;
+        exit 1
+        ;;
 esac
+
+DISTRO=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
 
 if ! systemctl is-active --quiet docker; then 
     echo "Starting Docker..."
