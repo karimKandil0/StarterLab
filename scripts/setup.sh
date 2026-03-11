@@ -91,10 +91,14 @@ case "$DISTRO" in
         ;;
 esac
 
-if ! systemctl is-active --quiet docker; then 
-    echo "Starting Docker..."
-    sudo systemctl enable docker
-    sudo systemctl start docker
+if command -v systemctl >/dev/null 2>&1; then
+    if ! systemctl is-active --quiet docker; then 
+        echo "Starting Docker..."
+        sudo systemctl enable docker
+        sudo systemctl start docker
+    fi
+else 
+    echo "systemd not detected, skipping Docker service management."
 fi
 
 # Ask user configuration
