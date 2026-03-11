@@ -1,10 +1,8 @@
-version: "3.9"
-
 services:
   caddy:
     image: caddy:2
     container_name: homelab-caddy
-    restart: unless stopped
+    restart: unless-stopped
     depends_on:
       - vaultwarden
       - gitea
@@ -12,7 +10,7 @@ services:
     ports: 
       - "8080:80"
     volumes:
-      - ..proxy/Caddyfile:/etc/caddy/Caddyfile
+      - ../proxy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -25,7 +23,10 @@ services:
     volumes:
       - ../data/vaultwarden:/data
     networks:
-      - homelab
+      homelab:
+        aliases:
+          - vaultwarden
+
 
   gitea:
     image: gitea/gitea:latest
@@ -34,7 +35,9 @@ services:
     volumes:
       - ../data/gitea:/data
     networks:
-      - homelab
+      homelab:
+        aliases:
+          - gitea
 
   grafana:
     image: grafana/grafana:latest
@@ -43,12 +46,13 @@ services:
     volumes:
       - ../data/grafana:/var/lib/grafana
     networks:
-      - homelab
+      homelab:
+        aliases:
+          - grafana
 
-  networks:
-    homelab:
+networks:
+  homelab:
 
-
-  volumes:
-    caddy_data:
-      caddy_config:
+volumes:
+  caddy_data:
+  caddy_config:

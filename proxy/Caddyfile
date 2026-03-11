@@ -1,11 +1,14 @@
-vault.localhost {
-    reverse_proxy vaultwarden:80
+{
+    auto_https off
 }
 
-grafana.localhost {
-    reverse_proxy grafana:3000
-}
+:80 {
+    @vault host vault.localhost
+    reverse_proxy @vault vaultwarden:80
 
-gitea.localhost {
-    reverse_proxy gitea:3000
+    @grafana host grafana.localhost
+    reverse_proxy @grafana grafana:3000
+
+    @gitea host gitea.localhost
+    reverse_proxy @gitea gitea:3000
 }
