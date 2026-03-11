@@ -1,94 +1,137 @@
 # Homelab Platform
 
-A modular self-hosted infrastructure platform built with **Docker Compose**, **Traefik**, and **Prometheus/Grafana** for monitoring.
+A lightweight **self-hosted infrastructure platform** built with **Docker Compose and Caddy** that demonstrates how multiple services can run behind a reverse proxy with persistent storage and simple lifecycle scripts.
 
-This project demonstrates how to build a small platform that can run and monitor multiple services behind a reverse proxy with observability.
+The goal of this project is to provide a **clean, modular reference implementation** of a small homelab or internal platform environment.
+
+It shows how to structure:
+
+- container orchestration
+- reverse proxy routing
+- environment-based configuration
+- persistent service data
+- reproducible infrastructure
+
+The platform currently includes:
+
+| Service | Purpose |
+|--------|--------|
+| Vaultwarden | Self-hosted password manager |
+| Gitea | Lightweight Git service |
+| Grafana | Metrics visualization platform |
+| Caddy | Reverse proxy and service router |
 
 ---
 
 # Architecture
 
-```
-                Browser
-                   │
-                   ▼
-            Traefik (Reverse Proxy)
-                :8088 entrypoint
-                   │
-        ┌──────────┼──────────┐
-        ▼          ▼          ▼
-   Vaultwarden   Grafana   Prometheus
-                                 │
-                                 ▼
-                           Node Exporter
-                           (system metrics)
-```
+The platform uses a **reverse proxy architecture** where all services run behind Caddy on a shared Docker network.
 
-### Traffic Flow
+Traffic from the browser enters through Caddy and is routed to services based on hostname.
 
 ```
-Browser → Traefik → Service Container
+Browser
+   │
+   ▼
+Caddy (Reverse Proxy)
+   │
+   ├── Vaultwarden
+   ├── Gitea
+   └── Grafana
 ```
 
-Example:
+Key design decisions:
+
+- **Single entry point** through the reverse proxy
+- **Docker networking** for service communication
+- **Environment variables** for configuration
+- **Persistent data directories** for service state
+- **Simple lifecycle scripts** for startup and shutdown
+
+More details are available in:
 
 ```
-vault.localhost:8088 → Vaultwarden
-grafana.localhost:8088 → Grafana
-prometheus.localhost:8088 → Prometheus
+docs/architecture.md
 ```
 
 ---
 
-# Stack
+# Quick Start
 
-### Reverse Proxy
+## 1. Clone the repository
 
-* **Traefik**
-* Dynamic Docker service discovery
-* Host-based routing
-* Central entrypoint for all services
+```bash
+git clone https://github.com/karimKandil0/homelab-platform.git
+cd homelab-platform
+```
 
 ---
 
-### Monitoring
+## 2. Configure environment variables
 
-* **Prometheus** – metrics collection
-* **Grafana** – visualization dashboards
-* **Node Exporter** – host system metrics
+Copy the example configuration:
 
-Metrics pipeline:
-
-```
-node-exporter → Prometheus → Grafana
+```bash
+cp .env.example .env
 ```
 
-Collected metrics include:
-
-* CPU usage
-* Memory usage
-* Disk I/O
-* Network usage
+You may edit `.env` to change ports or hostnames.
 
 ---
 
-### Services
+## 3. Start the platform
 
-#### Vaultwarden
+```bash
+./scripts/start.sh
+```
 
-Lightweight Bitwarden-compatible password manager.
+Docker images will be pulled and the platform will start.
 
-#### Grafana
+---
 
-Visualization dashboards for system monitoring.
+## 4. Access services
 
-#### Prometheus
+Once started, the services will be available at:
 
-Time-series database used for metrics collection.
+```
+Vaultwarden → http://vault.localhost:8080
+Gitea       → http://gitea.localhost:8080
+Grafana     → http://grafana.localhost:8080
+```
 
-#### Node Exporter
+---
 
-Exports Linux host metrics for Prometheus.
+## 5. Stop the platform
+
+```bash
+./scripts/stop.sh
+```
+
+---
+
+# Configuration
+
+Platform configuration is handled through environment variables defined in:
+
+```
+.env
+```
+
+Example configuration:
+
+```env
+PORT=8080
+
+VAULT_HOST=vault.localhost
+GITEA_HOST=gitea.localhost
+GRAFANA_HOST=grafana.localhost
+```
+
+These values are used by:
+
+- Docker Compose
+- the Caddy reverse proxy
+- the startup scripts
 
 ---
 
@@ -97,108 +140,131 @@ Exports Linux host metrics for Prometheus.
 ```
 homelab-platform
 │
-├── docker-compose.yml
+├── compose/
+│   └── stack.yml
 │
-├── services
-│   ├── vaultwarden
-│   │   └── data
-│   ├── grafana
-│   │   └── data
-│   └── node-exporter
+├── proxy/
+│   └── Caddyfile
 │
-├── monitoring
-│   └── prometheus
-│       └── prometheus.yml
+├── scripts/
+│   ├── start.sh
+│   └── stop.sh
 │
+├── docs/
+│   └── architecture.md
+│
+├── data/
+│   ├── gitea/
+│   ├── grafana/
+│   └── vaultwarden/
+│
+├── .env.example
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-# Running the Platform
+# Reverse Proxy Routing
 
-### Requirements
+Caddy handles routing between services.
 
-* Docker
-* Docker Compose
+Example configuration:
 
-### Start all services
+```caddy
+:80 {
 
-```bash
-docker compose up -d
+  @vault host vault.localhost
+  reverse_proxy @vault vaultwarden:80
+
+  @grafana host grafana.localhost
+  reverse_proxy @grafana grafana:3000
+
+  @gitea host gitea.localhost
+  reverse_proxy @gitea gitea:3000
+
+}
 ```
 
-### Check running containers
+This allows services to be accessed by hostname instead of port numbers.
+
+---
+
+# Persistent Storage
+
+Service data is stored in the `data/` directory.
+
+Examples:
+
+```
+data/grafana/
+data/gitea/
+data/vaultwarden/
+```
+
+This ensures that:
+
+- container restarts do not lose data
+- updates are safe
+- backups are possible
+
+---
+
+# Requirements
+
+To run this platform you need:
+
+- Docker
+- Docker Compose
+- Bash shell
+
+Most Linux distributions and macOS systems support this setup.
+
+---
+
+# Troubleshooting
+
+## Services not accessible
+
+Check running containers:
 
 ```bash
 docker ps
 ```
 
-### Stop services
+---
+
+## Reverse proxy issues
+
+Check Caddy logs:
 
 ```bash
-docker compose down
+docker logs homelab-caddy
 ```
 
 ---
 
-# Service Endpoints
+## Restart platform
 
-| Service           | URL                              |
-| ----------------- | -------------------------------- |
-| Vaultwarden       | http://vault.localhost:8088      |
-| Grafana           | http://grafana.localhost:8088    |
-| Prometheus        | http://prometheus.localhost:8088 |
-| Traefik Dashboard | http://localhost:8080            |
-
----
-
-# Observability
-
-Prometheus scrapes metrics from the Node Exporter:
-
-```
-http://node-exporter:9100/metrics
+```bash
+./scripts/stop.sh
+./scripts/start.sh
 ```
 
-Grafana dashboards visualize system metrics such as:
-
-* CPU utilization
-* Memory usage
-* Disk space
-* Network activity
-
 ---
 
-# Why This Project Exists
+# Future Improvements
 
-This repository is a learning project focused on:
+Possible future enhancements:
 
-* containerized infrastructure
-* reverse proxy architecture
-* service routing
-* monitoring and observability
-* self-hosted platforms
-
-The goal is to build a modular infrastructure stack that can easily scale with additional services.
-
----
-
-# Planned Improvements
-
-Future additions include:
-
-* TLS with Traefik + Let's Encrypt
-* additional services (Immich / Jellyfin / MinIO)
-* automated backups
-* infrastructure scripts
-* environment configuration
-* monitoring alerts
-* CI validation for Docker Compose
+- HTTPS support with automatic certificates
+- monitoring with Prometheus
+- service dashboard homepage
+- automatic service discovery
+- additional self-hosted services
 
 ---
 
 # License
 
-MIT
-
+This project is open source and available under the MIT License.

@@ -1,24 +1,12 @@
-Internet
-    |
-    |
-    |
-    |
-kariminfra.space
-    |
-    |
-    |
-    |
-Traefik Reverse Proxy
-    |
-    |
-    |--- Gitea
-    |
-    |--- Vaultwarden
-    |
-    |--- Grafana
-    |
-    |--- Prometheus
-             |
-             |
-             |
-             |--- Node Exporter
+Browser
+   |
+   |
+Caddy (reverse proxy)
+   |
+   |
+   |--- Vaultwarden
+   |
+   |--- Gitea
+   |
+   |--- Grafana
+   
