@@ -8,18 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo ./scripts/setup.sh
+      - run: sudo ./scripts/setup.sh --non-interactive
 
   debian:
     runs-on: ubuntu-latest
     container: debian:12
     steps:
       - uses: actions/checkout@v4
-      - run: sudo ./scripts/setup.sh
+      - run: |
+          apt update
+          apt install -y git ca-certificates
+          ./scripts/setup.sh --non-interactive
      
   arch:
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo ./scripts/setup.sh
+      - run: |
+          pacman -Sy --noconfirm git
+          ./scripts/setup.sh --non-interactive

@@ -18,6 +18,7 @@ echo "StarterLab Setup"
 echo "================"
 echo ""
 
+
 # Detect OS
 
 if [ -f /etc/os-release ]; then
@@ -107,21 +108,30 @@ echo ""
 echo "Configuration"
 echo "============="
 
-read -rp "Port for StarterLab [8080]:" PORT
-if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
-    echo "Invalid port."
-    exit 1
+
+if [[ "$1" == "--non-interactive" ]]; then
+    PORT=8080
+    ENABLE_VAULT=y
+    ENABLE_GITEA=y
+    ENABLE_GRAFANA=y
+else
+
+    read -rp "Port for StarterLab [8080]:" PORT
+    if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+        echo "Invalid port."
+        exit 1
+    fi
+    PORT=${PORT:-8080}
+
+    read -rp "Enable Vaultwarden? (Y/n):" ENABLE_VAULT
+    ENABLE_VAULT=${ENABLE_VAULT:-Y}
+
+    read -rp "Enable Gitea? (Y/n):" ENABLE_GITEA
+    ENABLE_GITEA=${ENABLE_GITEA:-Y}
+
+    read -rp "Enable Grafana? (Y/n):" ENABLE_Grafana
+    ENABLE_GRAFANA=${ENABLE_GRAFANA:-Y}
 fi
-PORT=${PORT:-8080}
-
-read -rp "Enable Vaultwarden? (Y/n):" ENABLE_VAULT
-ENABLE_VAULT=${ENABLE_VAULT:-Y}
-
-read -rp "Enable Gitea? (Y/n):" ENABLE_GITEA
-ENABLE_GITEA=${ENABLE_GITEA:-Y}
-
-read -rp "Enable Grafana? (Y/n):" ENABLE_Grafana
-ENABLE_GRAFANA=${ENABLE_GRAFANA:-Y}
 
 # Create .env
 
