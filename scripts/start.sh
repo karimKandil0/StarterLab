@@ -8,6 +8,10 @@ if [ ! -f .env ]; then
   echo ".env file created from template"
 fi
 
+set -a
+source .env
+set +a
+
 docker compose -f compose/stack.yml pull
 docker compose \
   --env-file .env \
