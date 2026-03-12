@@ -12,6 +12,9 @@ echo ""
 if command -v sudo >/dev/null 2>&1; then
     echo "Requesting sudo access to initialize StarterLab..."
     sudo -v
+    SUDO="sudo"
+else
+    SUDO=""
 fi
 echo ""
 echo ""
@@ -57,34 +60,34 @@ DISTRO=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
 
 case "$DISTRO" in
     ubuntu|debian)
-        apt update
+        $SUDO apt update
 
         if $INSTALL_DOCKER; then
-            apt install -y docker.io docker-compose
+            $SUDO apt install -y docker.io docker-compose
         fi
 
         if $INSTALL_GETTEXT; then
-            apt install -y gettext
+            $SUDO apt install -y gettext
         fi
         ;;
 
     arch)
         if $INSTALL_DOCKER; then
-            pacman -Sy --noconfirm docker docker-compose
+            $SUDO pacman -Sy --noconfirm docker docker-compose
         fi
 
         if $INSTALL_GETTEXT; then
-            pacman -Sy --noconfirm gettext
+            $SUDO pacman -Sy --noconfirm gettext
         fi
         ;;
 
     fedora)
         if $INSTALL_DOCKER; then
-            dnf install -y docker docker-compose-plugin
+            $SUDO dnf install -y docker docker-compose-plugin
         fi
 
         if $INSTALL_GETTEXT; then
-            dnf install -y gettext
+            $SUDO dnf install -y gettext
         fi
         ;;
 
@@ -99,8 +102,8 @@ if command -v systemctl >/dev/null 2>&1; then
 else 
     if ! systemctl is-active --quiet docker; then 
         echo "Starting Docker..."
-        systemctl enable docker
-        systemctl start docker
+        $SUDO systemctl enable docker
+        $SUDO systemctl start docker
     fi
 fi
 
@@ -176,10 +179,10 @@ mkdir -p data/vaultwarden
 echo ""
 echo "Setting container permissions..."
 
-chown -R 1000:1000 data/vaultwarden || true
-chown -R 1000:1000 data/gitea || true
-chown -R 472:472 data/grafana || true
-chown -R $(id -u):$(id -g) data || true
+$SUDO chown -R 1000:1000 data/vaultwarden || true
+$SUDO chown -R 1000:1000 data/gitea || true
+$SUDO chown -R 472:472 data/grafana || true
+$SUDO chown -R $(id -u):$(id -g) data || true
 
 echo ""
 echo "You may need to log out and back in for Docker permissions"
