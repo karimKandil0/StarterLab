@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 set -e
 
+# Detect Docker Compose command
+if command -v docker-compose >/dev/null 2>&1; then
+	COMPOSE=(docker-compose)
+elif docker compose version >/dev/null 2>&1; then
+	COMPOSE=(docker compose)
+else
+    echo "Error: Docker Compose is not available."
+    echo "Install Docker Compose plugin."
+    exit 1
+fi
+
 echo "Stopping homelab platform..."
 
-docker compose \
+"${COMPOSE[@]}" \
   --env-file .env \
   -f compose/stack.yml \
   down
