@@ -23,9 +23,9 @@ if ! command -v docker &> /dev/null; then
 fi
 
 if command -v docker-compose >/dev/null 2>&1; then
-    COMPOSE="docker-compose"
+	COMPOSE=(docker-compose)
 elif docker compose version >/dev/null 2>&1; then
-    COMPOSE="docker compose"
+	COMPOSE=(docker compose)
 else
     echo "Error: Docker Compose is not available."
     echo "Install Docker Compose plugin."
@@ -73,13 +73,13 @@ envsubst < homepage/services.yaml.template > homepage/services.yaml
 
 echo "Pulling containers..."
 
-docker compose -f compose/stack.yml pull
+"${COMPOSE[@]}" -f compose/stack.yml pull
 
 # Start stack
 
 echo "Starting containers..."
 
-docker compose \
+"${COMPOSE[@]}" \
     --env-file .env \
     -f compose/stack.yml \
     up -d
