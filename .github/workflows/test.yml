@@ -10,7 +10,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          token: ${{ secrets.GITHUB_TOKEN }}
       - run: sudo ./scripts/setup.sh --non-interactive
 
   debian:
@@ -20,7 +19,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          token: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           apt-get update
           apt-get install -y git ca-certificates
@@ -33,7 +31,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          token: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           pacman -Sy --noconfirm archlinux-keyring
           pacman -Sy --noconfirm git
