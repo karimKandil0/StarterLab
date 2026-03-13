@@ -91,6 +91,17 @@ case "$DISTRO" in
         fi
         ;;
 
+    nixos)
+        if $INSTALL_DOCKER; then
+            echo "Please install docker manually."
+        fi
+
+        if $INSTALL_GETTEXT; then
+	    echo "Please install gettext manually."
+	    exit 1
+        fi
+        ;;
+
     *)
         echo "Unsupported distro: $DISTRO"
         exit 1
