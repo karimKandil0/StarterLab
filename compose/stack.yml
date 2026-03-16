@@ -24,7 +24,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=3000
-      - HOMEPAGE_ALLOWED_HOSTS=${HOME_HOST}:${PORT}
+      - HOMEPAGE_ALLOWED_HOSTS=${HOME_HOST}
     volumes:
       - ../homepage:/app/config
     restart: unless-stopped
