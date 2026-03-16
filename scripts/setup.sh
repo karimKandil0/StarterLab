@@ -114,17 +114,17 @@ case "$DISTRO" in
         ;;
 esac
 
-if command -v systemctl >/dev/null 2>&1; then
-    echo "systemd not detected, skipping Docker service management."
-else 
-    if ! systemctl is-active --quiet docker; then 
+if [ "$IS_CONTAINER" = "true" ] || ! command -v systemctl >/dev/null 2>&1; then
+    echo "Skipping Docker service management (no systemd / CI)."
+else
+    if ! systemctl is-active --quiet docker; then
         echo "Starting Docker..."
         $SUDO systemctl enable docker
         $SUDO systemctl start docker
     fi
 fi
 
-# Ask user configuration
+# user configuration
 
 echo ""
 echo "Configuration"
