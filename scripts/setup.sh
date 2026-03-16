@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+VERSION="1.0.0"
+echo "StarterLab v$VERSION"
 echo ""
 echo "This scripts may request sudo privileges in order to:"
 echo " - Install Docker if its missing."
