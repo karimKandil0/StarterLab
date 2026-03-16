@@ -10,6 +10,7 @@ services:
       - GRAFANA_HOST=${GRAFANA_HOST}
     ports: 
       - "${PORT:-8080}:80"
+      - "443:443"
     volumes:
       - ../proxy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
