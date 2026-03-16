@@ -140,14 +140,35 @@ else
         exit 1
     fi
 
+    # Vaultwarden variable check
     read -rp "Enable Vaultwarden? (Y/n):" ENABLE_VAULT
     ENABLE_VAULT=${ENABLE_VAULT:-Y}
 
+    ENABLE_VAULT=$(echo "$ENABLE_VAULT" | tr '[:lower:]' '[:upper:]')
+    if [[ "$ENABLE_VAULT" != "Y" && "$ENABLE_VAULT" != "N" ]]; then
+        echo "Invalid input. Using default: Y"
+        ENABLE_VAULT="Y"
+    fi
+
+    # Gitea variable check
     read -rp "Enable Gitea? (Y/n):" ENABLE_GITEA
     ENABLE_GITEA=${ENABLE_GITEA:-Y}
 
-    read -rp "Enable Grafana? (Y/n):" ENABLE_Grafana
+    ENABLE_GITEA=$(echo "$ENABLE_GITEA" | tr '[:lower:]' '[:upper:]')
+    if [[ "$ENABLE_GITEA" != "Y" && "$ENABLE_GITEA" != "N" ]]; then
+        echo "Invalid input. Using default: Y"
+        ENABLE_GITEA="Y"
+    fi
+
+    # Grafana variable check
+    read -rp "Enable Grafana? (Y/n):" ENABLE_GRAFANA
     ENABLE_GRAFANA=${ENABLE_GRAFANA:-Y}
+
+    ENABLE_GRAFANA=$(echo "$ENABLE_GRAFANA" | tr '[:lower:]' '[:upper:]')
+    if [[ "$ENABLE_GRAFANA" != "Y" && "$ENABLE_GRAFANA" != "N" ]]; then
+        echo "Invalid input. Using default: Y"
+        ENABLE_GRAFANA="Y"
+    fi
 fi
 
 # Create .env
