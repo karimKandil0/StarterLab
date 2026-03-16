@@ -1,3 +1,4 @@
+![CI](https://github.com/karimKandil0/StarterLab/actions/workflows/test.yml/badge.svg)
 # StarterLab 🚀
 
 StarterLab is a self-hosted development environment bootstrapper that provisions a full stack of services using Docker, with a single command.
