@@ -1,37 +1,53 @@
 name: Installer Test
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
+  install-test:
+    name: ${{ matrix.distro }} install
+    runs-on: ubuntu-latest
 
-  ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - run: sudo ./scripts/setup.sh --non-interactive
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: ubuntu
+            container: ubuntu:24.04
 
-  debian:
-    runs-on: ubuntu-latest
-    container: debian:12
+          - distro: fedora
+            container: fedora:40
+
+          - distro: arch
+            container: archlinux:latest
+
+    container: ${{ matrix.container }}
+
+    env:
+      DISTRO: ${{ matrix.distro }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - run: |
-          apt-get update
-          apt-get install -y git ca-certificates
-          ./scripts/setup.sh --non-interactive
-     
-  arch:
-    runs-on: ubuntu-latest
-    container: archlinux:latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - run: |
-          pacman -Sy --noconfirm archlinux-keyring
-          pacman -Sy --noconfirm git
+
+      - name: Prepare environment
+        run: |
+          set -euo pipefail
+
+          if [ "$DISTRO" = "ubuntu" ]; then
+            apt-get update -y
+            apt-get install -y git ca-certificates sudo
+
+          elif [ "$DISTRO" = "fedora" ]; then
+            dnf install -y git ca-certificates sudo
+
+          elif [ "$DISTRO" = "arch" ]; then
+            pacman -Sy --noconfirm archlinux-keyring || true
+            pacman -Sy --noconfirm git sudo ca-certificates
+          fi
+
+      - name: Run installer
+        run: |
+          chmod +x scripts/setup.sh
           ./scripts/setup.sh --non-interactive
