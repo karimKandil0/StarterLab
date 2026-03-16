@@ -23,12 +23,6 @@ echo "StarterLab Setup"
 echo "================"
 echo ""
 
-# CI detection
-
-if [ "${CI:-}" = "true" ] || [ -f /.dockerenv ]; then
-    INSTALL_DOCKER=false
-    echo "CI/container detected - skipping Docker installation."
-fi
 
 # Detect OS
 
@@ -49,12 +43,18 @@ echo "Checking dependencies..."
 
 INSTALL_DOCKER=false
 INSTALL_GETTEXT=false
+IS_CONTAINER=false
 
-if ! command -v docker &>/dev/null; then
+if [ -n "${CI:-}" ] || [ -f /.dockerenv ]; then
+    IS_CONTAINER=true
+    echo "Running in CI/container --- skipping Docker install"
+fi
+
+if ! command -v docker >/dev/null 2>&1 && [ "$IS_CONTAINER" = "false" ]; then
     INSTALL_DOCKER=true
 fi
 
-if ! command -v envsubst &>/dev/null; then
+if ! command -v envsubst >/dev/null 2>&1; then
     INSTALL_GETTEXT=true
 fi
 
