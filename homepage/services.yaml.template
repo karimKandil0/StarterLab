@@ -4,14 +4,14 @@
         description: Platform dashboard
 
     - Vaultwarden:
-        href: http://${VAULT_HOST}
+        href: https://${VAULT_HOST}
         description: Password manager
         
     - Gitea:
-        href: http://${GITEA_HOST}
+        href: https://${GITEA_HOST}
         description: Git hosting
 
     - Grafana:
-        href: http://${GRAFANA_HOST}
+        href: https://${GRAFANA_HOST}
         description: Metrics dashboard
      
